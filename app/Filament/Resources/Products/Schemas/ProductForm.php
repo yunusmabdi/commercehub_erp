@@ -89,8 +89,15 @@ class ProductForm
                             ->label('Minimum Stock')
                             ->numeric()
                             ->default(0)
-                            ->required(),
+                            ->required()
+                            ->helperText('Low stock alert will trigger at this level.'),
 
+                        TextInput::make('maximum_stock')
+                            ->label('Maximum Stock')
+                            ->numeric()
+                            ->minValue(0)
+                            ->helperText('Optional maximum capacity for this product..'),
+                                                          
                         TextInput::make('unit')
                             ->label('Unit')
                             ->default('Piece')

@@ -39,16 +39,34 @@ class ProductsTable
                     ->sortable(),
                 
                 TextColumn::make('selling_price')
-                    ->label('Selling Price')
+                    ->label('Sell Price')
                     ->money('KES', true)
                     ->sortable(),
                     
                 TextColumn::make('stock_quantity')
-                    ->label('Stock Quantity')
+                    ->label('Stock')
+                    ->badge()
+                    ->color(function ($record) {
+
+                        if ($record->stock_quantity <= 0) {
+                            return 'danger';
+                        }
+
+                        if ($record->stock_quantity <= $record->minimum_stock) {
+                            return 'warning';
+                        }
+
+                        return 'success';
+                    })
                     ->sortable(),
                 
                 TextColumn::make('minimum_stock')
-                    ->label('Minimum Stock')
+                    ->label('Min Stock')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('maximum_stock')
+                    ->label('Max Stock')
                     ->searchable()
                     ->sortable(),
 
