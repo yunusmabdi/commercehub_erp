@@ -6,39 +6,80 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Actions\ViewAction;
 
 class SalesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('sale_date', 'desc')
+
             ->columns([
 
                 TextColumn::make('invoice_number')
+                    ->label('Invoice #')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->copyable()
+                    ->weight('bold'),
 
                 TextColumn::make('customer.name')
                     ->label('Customer')
-                    ->searchable(),
-
-                TextColumn::make('sale_date')
-                    ->date(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('status')
-                    ->badge(),
+                    ->badge()
+                    ->colors([
+                        'warning' => 'Draft',
+                        'success' => 'Completed',
+                        'danger' => 'Cancelled',
+                    ])
+                    ->sortable(),
 
                 TextColumn::make('total_amount')
-                    ->money('KES'),
+                    ->label('Grand Total')
+                    ->money('KES')
+                    ->sortable()
+                    ->alignEnd(),
+
+                TextColumn::make('sale_date')
+                    ->label('Sale Date')
+                    ->date('d M Y')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->since(),
+                    ->label('Created')
+                    ->since()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+
+            ->filters([
+
+                SelectFilter::make('status')
+                    ->options([
+                        'Draft' => 'Draft',
+                        'Completed' => 'Completed',
+                        'Cancelled' => 'Cancelled',
+                    ]),
+
+                Filter::make('today')
+                    ->label('Today')
+                    ->query(fn ($query) => $query->whereDate('sale_date', today())),
 
             ])
+
             ->recordActions([
-                EditAction::make(),
+                ViewAction::make(),
+
+                EditAction::make()
+                    ->visible(fn ($record) => $record->status === 'Draft'),
             ])
+
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

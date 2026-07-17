@@ -16,4 +16,14 @@ class EditSale extends EditRecord
             DeleteAction::make(),
         ];
     }
+    protected function authorizeAccess(): void
+    {
+        parent::authorizeAccess();
+
+        abort_if(
+            in_array($this->record->status, ['Completed', 'Cancelled']),
+            403,
+            'This sale can no longer be edited.'
+        );
+    }
 }
