@@ -11,12 +11,15 @@ use App\Models\StockMovement;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use BackedEnum;
+use UnitEnum;
 
 class StockMovementResource extends Resource
 {
     protected static ?string $model = StockMovement::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrows-right-left';
+    protected static string|UnitEnum|null $navigationGroup = 'Inventory';
     protected static ?string $navigationLabel = 'Stock Movements';
 
     protected static ?int $navigationSort = 2;
