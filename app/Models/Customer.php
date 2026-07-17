@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
@@ -32,6 +33,10 @@ class Customer extends Model
                 $customer->customer_code = 'CUS-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
             }
         });
+    }
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
     }
 
 }
