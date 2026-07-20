@@ -10,6 +10,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
+
 
 class SalesTable
 {
@@ -78,12 +80,13 @@ class SalesTable
 
                 EditAction::make()
                     ->visible(fn ($record) => $record->status === 'Draft'),
+
+                DeleteAction::make()
+                    ->visible(fn ($record) => $record->status === 'Draft'),
             ])
 
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                
             ]);
     }
 }
