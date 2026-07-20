@@ -60,26 +60,7 @@ class SaleForm
                             ->relationship()
                             ->live()
                             ->afterStateUpdated(function (Get $get, Set $set) {
-
-                                $subtotal = collect($get('items') ?? [])
-                                    ->sum(function ($item) {
-
-                                        return ($item['quantity'] ?? 0) *
-                                            ($item['unit_price'] ?? 0);
-                                    });
-
-
-                                $set('subtotal', $subtotal);
-
-
-                                $discount = (float) ($get('discount') ?? 0);
-                                $tax = (float) ($get('tax') ?? 0);
-
-
-                                $set(
-                                    'total_amount',
-                                    ($subtotal - $discount) + $tax
-                                );
+                                self::updateTotals($get, $set);
                             })
                             ->schema([
                                 Select::make('product_id')
@@ -119,10 +100,12 @@ class SaleForm
                                     ->live()
                                     ->required()
                                     ->afterStateUpdated(function ($state, Get $get, Set $set) {
-                                        $quantity = (float) ($state ?? 0);
-                                        $unitPrice = (float) ($get('unit_price') ?? 0);
+                                        $quantity = (float) ($state ?: 0);
+                                        $unitPrice = (float) ($get('unit_price') ?: 0);
 
                                         $set('line_total', $quantity * $unitPrice);
+
+                                        self::updateTotals($get, $set);
                                     }),
 
                                 TextInput::make('unit_price')
@@ -132,10 +115,12 @@ class SaleForm
                                     ->live()
                                     ->required()
                                     ->afterStateUpdated(function ($state, Get $get, Set $set) {
-                                        $unitPrice = (float) ($state ?? 0);
-                                        $quantity = (float) ($get('quantity') ?? 0);
+                                        $unitPrice = (float) ($state ?: 0);
+                                        $quantity = (float) ($get('quantity') ?: 0);
 
                                         $set('line_total', $quantity * $unitPrice);
+
+                                        self::updateTotals($get, $set);
                                     }),
 
                                 TextInput::make('line_total')
@@ -174,7 +159,11 @@ class SaleForm
                             ->label('Tax')
                             ->numeric()
                             ->prefix('KES')
-                            ->default(0),
+                            ->default(0)
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                self::updateTotals($get, $set);
+                            }),
 
                         TextInput::make('total_amount')
                             ->label('Grand Total')
@@ -189,22 +178,19 @@ class SaleForm
     protected static function updateTotals(Get $get, Set $set): void
     {
         $subtotal = collect($get('items') ?? [])
-            ->sum(function ($item) {
+            ->sum(function ($item): float {
+                if (! is_array($item)) {
+                    return 0;
+                }
 
-                return ($item['quantity'] ?? 0) *
-                    ($item['unit_price'] ?? 0);
+                return (float) ($item['line_total'] ?? 0);
             });
 
-
-        $discount = (float) ($get('discount') ?? 0);
-        $tax = (float) ($get('tax') ?? 0);
-
+        $discount = (float) ($get('discount') ?: 0);
+        $tax = (float) ($get('tax') ?: 0);
 
         $set('subtotal', $subtotal);
 
-        $set(
-            'total_amount',
-            ($subtotal - $discount) + $tax
-        );
+        $set('total_amount', ($subtotal - $discount) + $tax);
     }
 }
