@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Hidden;
 
 class SaleForm
 {
@@ -88,9 +89,12 @@ class SaleForm
                                         $unitPrice = (float) $product->selling_price;
 
                                         $set('unit_price', $unitPrice);
+                                        $set('cost_price', $product->cost_price);
                                         $set('line_total', $quantity * $unitPrice);
                                         self::updateTotals($get, $set);
                                     }),
+                                Hidden::make('cost_price')
+                                    ->dehydrated(),
 
                                 TextInput::make('quantity')
                                     ->label('Quantity')

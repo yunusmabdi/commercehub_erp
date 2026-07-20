@@ -7,11 +7,32 @@ use App\Services\SalesService;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use App\Services\ProfitService;
+
 
 class ViewSale extends ViewRecord
 {
     protected static string $resource = SaleResource::class;
 
+    public function revenue(): float
+    {
+        return app(ProfitService::class)->revenue($this->record);
+    }
+
+    public function cost(): float
+    {
+        return app(ProfitService::class)->cost($this->record);
+    }
+
+    public function profit(): float
+    {
+        return app(ProfitService::class)->profit($this->record);
+    }
+
+    public function margin(): float
+    {
+        return app(ProfitService::class)->margin($this->record);
+    }
     protected function getHeaderActions(): array
     {
         return [
@@ -65,6 +86,12 @@ class ViewSale extends ViewRecord
                     }
                 }),
 
+        ];
+    }
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Sales\Widgets\SaleProfitOverview::class,
         ];
     }
 }
