@@ -1,0 +1,15 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::middleware(['auth', 'role:Cashier'])->group(function () {
+
+    Route::get('/pos', function () {
+        return view('pos.index');
+    })->name('pos');
+
+});
