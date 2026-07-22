@@ -1,110 +1,265 @@
-<div class="rounded-xl bg-white dark:bg-gray-900 shadow p-6 sticky top-6">
+<div class="rounded-2xl bg-white shadow-xl text-gray-900">
 
-    <h2 class="mb-6 text-xl font-bold">
-        🛒 Shopping Cart
-    </h2>
+    {{-- Header --}}
+    <div class="border-b px-6 py-5">
 
-    @forelse($this->cart as $item)
+        <div class="flex items-center justify-between">
 
-        <div class="border-b py-4">
+            <h2 class="text-xl font-bold text-[#0F172A]">
+                🛒 Shopping Cart
+            </h2>
 
-            <div class="flex items-start justify-between">
+            <span class="rounded-full bg-[#0F172A] px-3 py-1 text-sm font-bold text-white">
+                {{ $this->totalItems }}
+            </span>
 
-                <div>
-                    <h3 class="font-semibold text-[#0F172A]">
-                        {{ $item['name'] }}
-                    </h3>
+        </div>
 
-                    <p class="text-sm text-gray-500">
-                        {{ $item['sku'] }}
-                    </p>
+    </div>
 
-                    <p class="mt-1 font-semibold text-primary-600">
-                        KES {{ number_format($item['price'], 2) }}
-                    </p>
+
+    {{-- Items --}}
+    <div class="max-h-[500px] overflow-y-auto px-6">
+
+        @forelse($this->cart as $item)
+
+            <div class="border-b py-5">
+
+                <div class="flex justify-between">
+
+
+                    <div>
+
+                        <h3 class="font-semibold text-[#0F172A]">
+                            {{ $item['name'] }}
+                        </h3>
+
+
+                        <p class="text-sm text-gray-500">
+                            {{ $item['sku'] }}
+                        </p>
+
+
+                        <p class="mt-1 font-semibold text-green-600">
+                            KES {{ number_format($item['price'],2) }}
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        wire:click="removeItem('{{ $item['sku'] }}')"
+                        class="text-lg text-red-500 hover:text-red-700">
+
+                        ✕
+
+                    </button>
+
+
                 </div>
 
+
+
+                <div class="mt-4 flex items-center justify-between">
+
+
+                    <div class="flex items-center gap-3">
+
+
+                        <button
+                            wire:click="decreaseQuantity('{{ $item['sku'] }}')"
+                            class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 font-bold">
+
+                            −
+
+                        </button>
+
+
+                        <span class="w-8 text-center font-bold">
+
+                            {{ $item['quantity'] }}
+
+                        </span>
+
+
+                        <button
+                            wire:click="increaseQuantity('{{ $item['sku'] }}')"
+                            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F172A] font-bold text-white">
+
+                            +
+
+                        </button>
+
+
+                    </div>
+
+
+
+                    <span class="font-bold text-[#0F172A]">
+
+                        KES {{ number_format($item['price'] * $item['quantity'],2) }}
+
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+        @empty
+
+
+            <div class="py-16 text-center">
+
+                <div class="mb-3 text-6xl">
+                    🛒
+                </div>
+
+                <p class="font-semibold text-gray-500">
+                    Cart is empty
+                </p>
+
+            </div>
+
+
+        @endforelse
+
+
+    </div>
+
+
+
+    {{-- Totals --}}
+    <div class="border-t bg-gray-50 px-6 py-5">
+
+
+        <div class="space-y-3">
+
+
+            <div class="flex justify-between">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <span class="font-semibold text-green-600">
+                    KES {{ number_format($this->subtotal,2) }}
+                </span>
+
+            </div>
+
+
+
+            <div class="flex justify-between">
+
+                <span>
+                    Tax
+                </span>
+
+                <span class="font-semibold text-green-600">
+                    KES {{ number_format($this->tax,2) }}
+                </span>
+
+            </div>
+
+
+
+            <div class="flex justify-between border-t pt-3 text-xl font-bold">
+
+                <span>
+                    Total
+                </span>
+
+                <span class="text-green-600">
+
+                    KES {{ number_format($this->total,2) }}
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="mt-6 space-y-3">
+
+
+            <button
+                wire:click="clearCart"
+                class="w-full rounded-xl border border-red-300 py-3 font-semibold text-red-600 hover:bg-red-50">
+
+                Clear Cart
+
+            </button>
+
+
+
+            <button
+                wire:click="checkout"
+                class="w-full rounded-xl bg-[#0F172A] py-4 font-bold text-white hover:bg-slate-800">
+
+                Checkout
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+    {{-- Checkout Drawer --}}
+    @if($showCheckout)
+
+    <div class="fixed inset-0 z-50 bg-black/50">
+
+
+        <div class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl overflow-y-auto">
+
+
+            {{-- Drawer Header --}}
+            <div class="flex items-center justify-between border-b px-6 py-5 shrink-0">
+
+                <h2 class="text-2xl font-bold text-[#0F172A]">
+                    Checkout
+                </h2>
+
+
                 <button
-                    wire:click="removeItem('{{ $item['sku'] }}')"
-                    class="text-red-500 hover:text-red-700"
-                >
-                    ✕
+                    wire:click="closeCheckout"
+                    class="text-3xl text-gray-400 hover:text-red-500">
+
+                    ×
+
                 </button>
 
             </div>
 
-            <div class="mt-3 flex items-center justify-between">
 
-                <div class="flex items-center gap-2">
 
-                    <button
-                        wire:click="decreaseQuantity('{{ $item['sku'] }}')"
-                        class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition">
-                        −
-                    </button>
+            {{-- Scrollable Content --}}
+            <div class="flex-1 overflow-y-auto p-6">
 
-                    <span class="w-8 text-center font-bold">
-                        {{ $item['quantity'] }}
-                    </span>
 
-                    <button
-                        wire:click="increaseQuantity('{{ $item['sku'] }}')"
-                        class="w-8 h-8 rounded-full bg-[#0F172A] text-white hover:bg-slate-800 transition">
-                        +
-                    </button>
+                <livewire:p-o-s.checkout-panel />
 
-                </div>
-
-                <div class="font-bold">
-                    KES {{ number_format($item['price'] * $item['quantity'], 2) }}
-                </div>
 
             </div>
 
-        </div>
-
-    @empty
-
-        <div class="py-10 text-center text-gray-500">
-
-            <div class="text-5xl mb-3">
-                🛒
-            </div>
-
-            <p>No products added.</p>
 
         </div>
 
-    @endforelse
-
-    <div class="mt-6 border-t pt-4">
-
-        <div class="flex justify-between">
-            <span>Subtotal</span>
-            <span>KES {{ number_format($this->subtotal, 2) }}</span>
-        </div>
-
-        <div class="mt-2 flex justify-between">
-            <span>Tax</span>
-            <span>KES {{ number_format($this->tax, 2) }}</span>
-        </div>
-
-        <div class="mt-4 flex justify-between text-xl font-bold text-[#0F172A]">
-            <span>Total</span>
-            <span>KES {{ number_format($this->total, 2) }}</span>
-        </div>
-
-        <button
-            wire:click="clearCart"
-            class="w-full mb-3 rounded-xl border border-red-200 py-3 text-red-600 hover:bg-red-50 transition">
-            Clear Cart
-        </button>
-
-        <button
-            class="mt-6 w-full rounded-xl bg-[#0F172A] py-3 text-white font-semibold hover:bg-slate-800 transition">
-            Complete Sale
-        </button>
 
     </div>
+
+    @endif
+
 
 </div>

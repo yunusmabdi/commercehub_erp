@@ -8,62 +8,73 @@ use Livewire\Component;
 
 class ShoppingCart extends Component
 {
-    protected CartService $cartService;
-
-    public function boot(CartService $cartService): void
-    {
-        $this->cartService = $cartService;
-    }
+    public bool $showCheckout = false;
 
     #[On('product-selected')]
     public function addProduct(array $product): void
     {
-        $this->cartService->add($product);
+        app(CartService::class)->add($product);
     }
 
     public function removeItem(string $sku): void
     {
-        $this->cartService->remove($sku);
+        app(CartService::class)->remove($sku);
     }
 
     public function increaseQuantity(string $sku): void
     {
-        $this->cartService->increase($sku);
+        app(CartService::class)->increase($sku);
     }
 
     public function decreaseQuantity(string $sku): void
     {
-        $this->cartService->decrease($sku);
+        app(CartService::class)->decrease($sku);
     }
 
     public function clearCart(): void
     {
-        $this->cartService->clear();
+        app(CartService::class)->clear();
     }
 
     public function getCartProperty(): array
     {
-        return $this->cartService->all();
+        return app(CartService::class)->all();
     }
 
     public function getSubtotalProperty(): float
     {
-        return $this->cartService->subtotal();
+        return app(CartService::class)->subtotal();
     }
 
     public function getTaxProperty(): float
     {
-        return $this->cartService->tax();
+        return app(CartService::class)->tax();
     }
 
     public function getTotalProperty(): float
     {
-        return $this->cartService->total();
+        return app(CartService::class)->total();
     }
 
     public function getTotalItemsProperty(): int
     {
-        return $this->cartService->totalItems();
+        return app(CartService::class)->totalItems();
+    }
+
+    public function checkout(): void
+    {
+        $this->showCheckout = true;
+    }
+
+    public function closeCheckout(): void
+    {
+        $this->showCheckout = false;
+    }
+
+    #[On('sale-completed')]
+    public function refreshCart(): void
+    {
+        $this->showCheckout = false;
     }
 
     public function render()

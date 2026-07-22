@@ -13,10 +13,17 @@ class Sale extends Model
         'customer_id',
         'sale_date',
         'status',
+
+        'payement_method',
+
         'subtotal',
         'discount',
         'tax',
         'total_amount',
+
+        'amount_paid',
+        'change_amount',
+        
         'notes',
     ];
 
@@ -47,5 +54,10 @@ class Sale extends Model
     public function items(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+    protected function casts(): array{
+        return[
+            'sale_date' => 'datetime',
+        ];
     }
 }

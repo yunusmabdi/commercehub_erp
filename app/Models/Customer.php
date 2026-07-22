@@ -39,4 +39,10 @@ class Customer extends Model
         return $this->hasMany(Sale::class);
     }
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
 }

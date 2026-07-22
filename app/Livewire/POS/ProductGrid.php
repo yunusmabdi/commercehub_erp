@@ -32,6 +32,7 @@ class ProductGrid extends Component
                 'name'  => $product->name,
                 'price' => $product->selling_price,
                 'sku'   => $product->sku,
+                'cost_price' => $product->cost_price,
             ]
         );
     }

@@ -28,6 +28,7 @@ class CartService
                 'sku' => $product['sku'],
                 'name' => $product['name'],
                 'price' => $product['price'],
+                'cost_price' => $product['cost_price'],
                 'quantity' => 1,
             ];
         }
