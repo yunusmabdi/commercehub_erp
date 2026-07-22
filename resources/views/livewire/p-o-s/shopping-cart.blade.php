@@ -1,21 +1,21 @@
-<div class="rounded-xl bg-white dark:bg-gray-900 shadow p-6 sticky top-6 text-white">
+<div class="rounded-xl bg-white dark:bg-gray-900 shadow p-6 sticky top-6">
 
     <h2 class="mb-6 text-xl font-bold">
         🛒 Shopping Cart
     </h2>
 
-    @forelse($cart as $item)
+    @forelse($this->cart as $item)
 
         <div class="border-b py-4">
 
             <div class="flex items-start justify-between">
 
                 <div>
-                    <h3 class="font-semibold text-white">
+                    <h3 class="font-semibold text-[#0F172A]">
                         {{ $item['name'] }}
                     </h3>
 
-                    <p class="text-sm text-gray-500 text-white">
+                    <p class="text-sm text-gray-500">
                         {{ $item['sku'] }}
                     </p>
 
@@ -39,19 +39,17 @@
 
                     <button
                         wire:click="decreaseQuantity('{{ $item['sku'] }}')"
-                        class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"
-                    >
-                        -
+                        class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition">
+                        −
                     </button>
 
-                    <span class="w-8 text-center">
+                    <span class="w-8 text-center font-bold">
                         {{ $item['quantity'] }}
                     </span>
 
                     <button
                         wire:click="increaseQuantity('{{ $item['sku'] }}')"
-                        class="h-8 w-8 rounded bg-primary-600 text-white"
-                    >
+                        class="w-8 h-8 rounded-full bg-[#0F172A] text-white hover:bg-slate-800 transition">
                         +
                     </button>
 
@@ -91,14 +89,19 @@
             <span>KES {{ number_format($this->tax, 2) }}</span>
         </div>
 
-        <div class="mt-4 flex justify-between text-xl font-bold text-white">
+        <div class="mt-4 flex justify-between text-xl font-bold text-[#0F172A]">
             <span>Total</span>
             <span>KES {{ number_format($this->total, 2) }}</span>
         </div>
 
         <button
-            class="mt-6 w-full rounded-lg bg-primary-600 py-3 font-semibold text-white hover:bg-primary-700"
-        >
+            wire:click="clearCart"
+            class="w-full mb-3 rounded-xl border border-red-200 py-3 text-red-600 hover:bg-red-50 transition">
+            Clear Cart
+        </button>
+
+        <button
+            class="mt-6 w-full rounded-xl bg-[#0F172A] py-3 text-white font-semibold hover:bg-slate-800 transition">
             Complete Sale
         </button>
 

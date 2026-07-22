@@ -2,65 +2,68 @@
 
 namespace App\Livewire\POS;
 
-use App\Models\Product;
+use App\Services\CartService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ShoppingCart extends Component
 {
-    public array $cart = [];
+    protected CartService $cartService;
 
-    #[On('product-added')]
-    public function addProduct(string $sku): void
+    public function boot(CartService $cartService): void
     {
-        $product = Product::where('sku', $sku)->firstOrFail();
+        $this->cartService = $cartService;
+    }
 
-        if (isset($this->cart[$sku])) {
-            $this->cart[$sku]['quantity']++;
-        } else {
-            $this->cart[$sku] = [
-                'sku' => $product->sku,
-                'name' => $product->name,
-                'price' => $product->selling_price,
-                'quantity' => 1,
-            ];
-        }
+    #[On('product-selected')]
+    public function addProduct(array $product): void
+    {
+        $this->cartService->add($product);
     }
 
     public function removeItem(string $sku): void
     {
-        unset($this->cart[$sku]);
+        $this->cartService->remove($sku);
     }
 
     public function increaseQuantity(string $sku): void
     {
-        $this->cart[$sku]['quantity']++;
+        $this->cartService->increase($sku);
     }
 
     public function decreaseQuantity(string $sku): void
     {
-        if ($this->cart[$sku]['quantity'] > 1) {
-            $this->cart[$sku]['quantity']--;
-        } else {
-            unset($this->cart[$sku]);
-        }
+        $this->cartService->decrease($sku);
+    }
+
+    public function clearCart(): void
+    {
+        $this->cartService->clear();
+    }
+
+    public function getCartProperty(): array
+    {
+        return $this->cartService->all();
     }
 
     public function getSubtotalProperty(): float
     {
-        return collect($this->cart)->sum(
-            fn ($item) => $item['price'] * $item['quantity']
-        );
+        return $this->cartService->subtotal();
     }
 
     public function getTaxProperty(): float
     {
-        return 0;
+        return $this->cartService->tax();
     }
 
     public function getTotalProperty(): float
     {
-        return $this->subtotal + $this->tax;
+        return $this->cartService->total();
+    }
+
+    public function getTotalItemsProperty(): int
+    {
+        return $this->cartService->totalItems();
     }
 
     public function render()
