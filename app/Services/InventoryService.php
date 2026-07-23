@@ -41,8 +41,8 @@ class InventoryService
 
             $product = $item->product;
 
-            $product->decrement('stock_quantity', $item->quantity);
-
+            $product = Product::lockForUpdate()
+                ->find($item->product_id);
             StockMovement::create([
                 'product_id'     => $product->id,
                 'type'           => 'OUT',

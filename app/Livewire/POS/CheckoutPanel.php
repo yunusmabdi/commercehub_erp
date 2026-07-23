@@ -48,61 +48,47 @@ class CheckoutPanel extends Component
 
 
 
-    public function completeSale(): void
+    public function completeSale()
     {
-
         $this->error = '';
 
         $this->validate([
             'paymentMethod' => [
                 'required',
-                'string'
+                'string',
             ],
 
             'amountPaid' => [
                 'required',
                 'numeric',
-                'min:0'
+                'min:0',
             ],
         ]);
 
-
-
         try {
 
-
-            app(CheckoutService::class)->checkout(
-
+            $sale = app(CheckoutService::class)->checkout(
                 $this->customerId,
-
                 $this->paymentMethod,
-
                 $this->amountPaid
-
             );
-
-
 
             $this->reset([
                 'customerId',
                 'amountPaid',
             ]);
 
-
             $this->paymentMethod = 'Cash';
 
+            return redirect()->route('pos.receipt', [
+                'sale' => $sale,
+            ]);
 
-            $this->dispatch('sale-completed');
-
-
-
-        } catch(RuntimeException $e) {
-
+        } catch (RuntimeException $e) {
 
             $this->error = $e->getMessage();
 
         }
-
     }
 
 

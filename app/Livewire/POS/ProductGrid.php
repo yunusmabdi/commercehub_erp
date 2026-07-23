@@ -40,10 +40,14 @@ class ProductGrid extends Component
     public function getProductsProperty()
     {
         return Product::query()
+            ->when(
+                $this->selectedCategory,
+                fn ($query) => $query->where('category_id', $this->selectedCategory)
+            )
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', "%{$this->search}%")
-                      ->orWhere('sku', 'like', "%{$this->search}%");
+                    ->orWhere('sku', 'like', "%{$this->search}%");
                 });
             })
             ->orderBy('name')
@@ -58,5 +62,10 @@ class ProductGrid extends Component
     public function getCategoriesProperty()
     {
         return Category::orderBy('name')->get();
+    }
+
+    public function selectCategory(?int $categoryId): void
+    {
+        $this->selectedCategory = $categoryId;
     }
 }

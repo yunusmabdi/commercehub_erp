@@ -1,147 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>CommerceHub POS Login</title>
 
     @vite(['resources/css/app.css'])
-
 </head>
 
-
-<body class="min-h-screen bg-[#F8F1E7] flex items-center justify-center">
-
+<body class="min-h-screen bg-slate-100 flex items-center justify-center px-6">
 
 <div class="w-full max-w-md">
 
+    <!-- Logo -->
 
-    <!-- Logo / Header -->
+    <div class="text-center mb-8">
 
-    <div class="text-center mb-6">
+        <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[#0F172A] shadow-xl">
 
-        <div class="inline-flex items-center justify-center
-                    w-20 h-20
-                    rounded-full
-                    bg-[#0F172A]
-                    text-white
-                    text-4xl
-                    shadow-lg">
-
-            🏪
+            <span class="text-4xl">🏪</span>
 
         </div>
 
-
-        <h1 class="mt-4 text-3xl font-bold text-[#0F172A]">
-            CommerceHub POS
+        <h1 class="mt-6 text-4xl font-bold tracking-tight text-[#0F172A]">
+            CommerceHub
         </h1>
 
-
-        <p class="text-[#0F172A] mt-2 font-medium">
-            Cashier Login
+        <p class="mt-2 text-slate-500">
+            Point of Sale System
         </p>
 
     </div>
 
+    <!-- Card -->
 
+    <div class="rounded-3xl bg-white border border-slate-200 shadow-2xl p-8">
 
-    <!-- Login Card -->
+        <div class="mb-8">
 
-    <div class="bg-[#0F172A]
-                rounded-2xl
-                shadow-xl
-                p-8">
+            <h2 class="text-2xl font-bold text-slate-900">
+                Welcome Back
+            </h2>
 
+            <p class="mt-1 text-slate-500">
+                Sign in to continue to your POS terminal.
+            </p>
 
-        <form method="POST" action="{{ route('pos.login.submit') }}">
+        </div>
+
+        <form method="POST" action="{{ route('pos.login.submit') }}" class="space-y-6">
 
             @csrf
 
+            <div>
 
-            <div class="mb-5">
-
-                <label class="block text-white mb-2 font-medium">
-                    Email
+                <label class="mb-2 block text-sm font-semibold text-slate-700">
+                    Email Address
                 </label>
-
 
                 <input
                     type="email"
                     name="email"
+                    value="{{ old('email') }}"
                     placeholder="cashier@example.com"
-                    class="w-full
-                           rounded-xl
-                           px-4
-                           py-3
-                           bg-[#F8F1E7]
-                           text-[#0F172A]
-                           placeholder-[#64748B]
-                           border-0
-                           focus:ring-2
-                           focus:ring-white">
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#0F172A] focus:ring-4 focus:ring-slate-200">
+
+                @error('email')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
 
             </div>
 
+            <div>
 
-
-            <div class="mb-6">
-
-                <label class="block text-white mb-2 font-medium">
+                <label class="mb-2 block text-sm font-semibold text-slate-700">
                     Password
                 </label>
-
 
                 <input
                     type="password"
                     name="password"
                     placeholder="••••••••"
-                    class="w-full
-                           rounded-xl
-                           px-4
-                           py-3
-                           bg-[#F8F1E7]
-                           text-[#0F172A]
-                           placeholder-[#64748B]
-                           border-0
-                           focus:ring-2
-                           focus:ring-white">
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#0F172A] focus:ring-4 focus:ring-slate-200">
+
+                @error('password')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
 
             </div>
 
-
-
-
             <button
-                class="w-full
-                       bg-white
-                       text-[#0F172A]
-                       font-bold
-                       py-3
-                       rounded-xl
-                       hover:bg-[#F8F1E7]
-                       transition">
+                type="submit"
+                class="w-full rounded-xl bg-[#0F172A] py-3 font-semibold text-white shadow-lg transition duration-200 hover:bg-slate-800 hover:shadow-xl">
 
-                Login
+                Sign In
 
             </button>
 
-
-
         </form>
-
 
     </div>
 
+    <p class="mt-8 text-center text-sm text-slate-500">
 
-    <p class="text-center text-[#0F172A] text-sm mt-6 font-medium">
-
-        © {{ date('Y') }} CommerceHub ERP
+        © {{ date('Y') }} CommerceHub ERP • Powered by @Abdi
 
     </p>
 
-
 </div>
-
 
 </body>
 

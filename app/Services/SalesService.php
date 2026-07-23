@@ -17,15 +17,12 @@ class SalesService
      */
     public function completeSale(Sale $sale): void
     {
-        DB::transaction(function () use ($sale) {
+        $this->inventoryService->validateSaleStock($sale);
 
-            $this->inventoryService->validateSaleStock($sale);
+        $this->inventoryService->issueSaleStock($sale);
 
-            $this->inventoryService->issueSaleStock($sale);
-
-            $sale->update([
-                'status' => 'Completed',
-            ]);
-        });
+        $sale->update([
+            'status' => 'Completed',
+        ]);
     }
 }

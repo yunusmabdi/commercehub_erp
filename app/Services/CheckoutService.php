@@ -53,7 +53,7 @@ class CheckoutService
              */
 
             $sale = Sale::create([
-                'customer_id'     => null,
+                'customer_id'     => $customerId,
                 'sale_date'       => now(),
                 'status'          => 'Draft',
 

@@ -14,7 +14,7 @@ class Sale extends Model
         'sale_date',
         'status',
 
-        'payement_method',
+        'payment_method',
 
         'subtotal',
         'discount',
