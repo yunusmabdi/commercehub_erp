@@ -11,6 +11,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Actions\ViewAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\Action;
 
 
 class SalesTable
@@ -78,11 +79,19 @@ class SalesTable
             ->recordActions([
                 ViewAction::make(),
 
+                Action::make('receipt')
+                    ->label('Receipt')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->url(fn ($record) => route('receipt.show', ['sale' => $record]))
+                    ->openUrlInNewTab(),
+
                 EditAction::make()
                     ->visible(fn ($record) => $record->status === 'Draft'),
 
                 DeleteAction::make()
                     ->visible(fn ($record) => $record->status === 'Draft'),
+
             ])
 
             ->toolbarActions([

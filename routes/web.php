@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\POS\AuthController;
-use App\Http\Controllers\POS\ReceiptController;
 use App\Http\Controllers\POS\SalesHistoryController;
+use App\Http\Controllers\ReceiptController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,8 +24,6 @@ Route::middleware('guest')->group(function () {
         ->name('pos.login.submit');
 });
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Protected POS
@@ -38,24 +36,22 @@ Route::middleware(['auth', 'role:Cashier|Manager|Admin'])->group(function () {
         return view('pos.index');
     })->name('pos');
 
-    Route::post('/pos/logout', [AuthController::class, 'logout'])
-    ->middleware('auth')
-    ->name('pos.logout');
-
-});
-
-Route::middleware(['auth', 'role:Cashier|Manager|Admin'])->group(function () {
-
     Route::get('/pos/history', [SalesHistoryController::class, 'index'])
         ->name('pos.history');
-    
-    Route::get('/pos', function () {
-        return view('pos.index');
-    })->name('pos');
-
-    Route::get('/pos/receipt/{sale}', [ReceiptController::class, 'show'])
-        ->name('pos.receipt');
 
     Route::post('/pos/logout', [AuthController::class, 'logout'])
         ->name('pos.logout');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Shared Receipt / Invoice
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/receipt/{sale}', [ReceiptController::class, 'show'])
+        ->name('receipt.show');
+
 });

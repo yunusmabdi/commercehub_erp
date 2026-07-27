@@ -128,7 +128,7 @@
                         <div class="flex justify-center gap-2">
 
                             <a
-                                href="{{ route('pos.receipt', $sale) }}"
+                                href="{{ route('receipt.show', $sale) }}"
                                 class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition">
 
                                 👁
@@ -136,7 +136,7 @@
                             </a>
 
                             <a
-                                href="{{ route('pos.receipt', $sale) }}"
+                                href="{{ route('receipt.show', $sale) }}"
                                 target="_blank"
                                 class="rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800 transition">
 

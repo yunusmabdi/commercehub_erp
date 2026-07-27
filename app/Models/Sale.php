@@ -60,4 +60,9 @@ class Sale extends Model
             'sale_date' => 'datetime',
         ];
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

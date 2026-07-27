@@ -63,7 +63,7 @@
                 <p class="text-slate-500">Cashier</p>
 
                 <p class="font-semibold">
-                    {{ auth()->user()->name }}
+                    {{ auth()->user()->name ?? 'System'}}
                 </p>
 
             </div>
@@ -190,13 +190,28 @@
 
             </button>
 
+            @if(request()->routeIs('pos.receipt'))
+
             <a
                 href="{{ route('pos') }}"
-                class="flex-1 text-center bg-slate-200 py-3 rounded-xl hover:bg-slate-300">
+                class="flex-1 text-center bg-slate-200 py-3 rounded-xl">
 
                 New Sale
 
             </a>
+
+            @endif
+            @if(request()->is('admin/*'))
+
+            <a
+                href="{{ url()->previous() }}"
+                class="flex-1 text-center bg-slate-200 py-3 rounded-xl">
+
+                Back
+
+            </a>
+
+            @endif
 
         </div>
 

@@ -80,7 +80,7 @@ class CheckoutPanel extends Component
 
             $this->paymentMethod = 'Cash';
 
-            return redirect()->route('pos.receipt', [
+            return redirect()->route('receipt.show', [
                 'sale' => $sale,
             ]);
 

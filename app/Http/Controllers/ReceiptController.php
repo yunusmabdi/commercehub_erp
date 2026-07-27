@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\POS;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Sale;
 
 class ReceiptController extends Controller
@@ -14,6 +13,8 @@ class ReceiptController extends Controller
             'items.product',
         ]);
 
-        return view('pos.receipt', compact('sale'));
+        return view('receipts.invoice', [
+            'sale' => $sale,
+        ]);
     }
 }
