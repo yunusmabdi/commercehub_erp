@@ -59,10 +59,10 @@ class CheckoutService
 
                 'payment_method'  => $paymentMethod,
 
-                'subtotal'        => $subtotal,
-                'discount'        => 0,
-                'tax'             => $tax,
-                'total_amount'    => $total,
+                'subtotal'      => $subtotal,
+                'discount'      => $this->cartService->discount(),
+                'tax'           => $tax,
+                'total_amount'  => $total,
 
                 'amount_paid'     => $amountPaid,
                 'change_amount'   => $change,
@@ -82,15 +82,19 @@ class CheckoutService
 
                 $sale->items()->create([
 
-                    'product_id' => $product->id,
+                    'product_id'       => $product->id,
 
-                    'quantity'   => $item['quantity'],
+                    'quantity'         => $item['quantity'],
 
-                    'unit_price' => $item['price'],
+                    'original_price'   => $item['original_price'],
 
-                    'cost_price' => $product->cost_price,
+                    'unit_price'       => $item['price'],
 
-                    'line_total' => $item['price'] * $item['quantity'],
+                    'discount_amount'  => $item['discount'],
+
+                    'cost_price'       => $product->cost_price,
+
+                    'line_total'       => $item['price'] * $item['quantity'],
 
                 ]);
             }

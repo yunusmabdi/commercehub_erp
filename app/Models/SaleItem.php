@@ -14,6 +14,8 @@ class SaleItem extends Model
         'unit_price',
         'cost_price',
         'line_total',
+        'originial_price',
+        'discount_amount'
     ];
 
     public function sale(): BelongsTo

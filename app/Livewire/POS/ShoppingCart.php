@@ -72,6 +72,7 @@ class ShoppingCart extends Component
     }
 
     #[On('sale-completed')]
+    #[On('cartUpdated')]
     public function refreshCart(): void
     {
         $this->showCheckout = false;

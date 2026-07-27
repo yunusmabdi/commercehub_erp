@@ -28,11 +28,18 @@ class ProductGrid extends Component
         $this->dispatch(
             'product-selected',
             product: [
-                'id'    => $product->id,
-                'name'  => $product->name,
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+
                 'price' => $product->selling_price,
-                'sku'   => $product->sku,
+                'discounted_price' => $product->discounted_price,
+
                 'cost_price' => $product->cost_price,
+
+                'discount_active' => $product->discount_active,
+                'discount_type' => $product->discount_type,
+                'discount_value' => $product->discount_value,
             ]
         );
     }

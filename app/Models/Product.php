@@ -71,4 +71,27 @@ class Product extends Model
     {
         return $this->hasMany(SaleItem::class);
     }
+
+    public function getDiscountedPriceAttribute(): float
+    {
+        if (! $this->discount_active) {
+            return (float) $this->selling_price;
+        }
+
+        return match ($this->discount_type) {
+
+            'percentage' => max(
+                0,
+                $this->selling_price -
+                ($this->selling_price * ($this->discount_value / 100))
+            ),
+
+            'fixed' => max(
+                0,
+                $this->selling_price - $this->discount_value
+            ),
+
+            default => (float) $this->selling_price,
+        };
+    }
 }

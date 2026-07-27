@@ -7,6 +7,8 @@ use App\Services\CartService;
 use App\Services\CheckoutService;
 use Livewire\Component;
 use RuntimeException;
+use App\Services\HeldSaleService;
+
 
 class CheckoutPanel extends Component
 {
@@ -90,9 +92,36 @@ class CheckoutPanel extends Component
 
         }
     }
+    public function holdSale()
+    {
+        $this->error = '';
 
+        try {
 
+            app(HeldSaleService::class)->hold(
+                $this->customerId,
+            );
 
+            $this->reset([
+                'customerId',
+                'amountPaid',
+            ]);
+
+            $this->paymentMethod = 'Cash';
+
+            session()->flash(
+                'success',
+                'Sale has been placed on hold.'
+            );
+
+            $this->dispatch('$refresh');
+
+        } catch (\RuntimeException $e) {
+
+            $this->error = $e->getMessage();
+
+        }
+    }
 
     public function render()
     {

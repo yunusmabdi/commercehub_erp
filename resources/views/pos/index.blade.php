@@ -145,8 +145,9 @@
         </div>
 
         <!-- Shopping Cart -->
-        <div class="col-span-4">
+        <div class="col-span-4 space-y-6">
 
+            {{-- Shopping Cart --}}
             <div class="bg-[#0F172A]
                         rounded-2xl
                         shadow-xl
@@ -157,8 +158,17 @@
 
             </div>
 
-        </div>
+            {{-- Held Sales --}}
+            <div class="bg-white
+                        rounded-2xl
+                        shadow
+                        p-5">
 
+                <livewire:p-o-s.held-sales />
+
+            </div>
+
+        </div>
     </div>
 
 </div>
