@@ -46,6 +46,11 @@ class ShoppingCart extends Component
         return app(CartService::class)->subtotal();
     }
 
+    public function getDiscountProperty(): float
+    {
+        return app(CartService::class)->discount();
+    }
+
     public function getTaxProperty(): float
     {
         return app(CartService::class)->tax();

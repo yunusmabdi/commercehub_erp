@@ -28,16 +28,17 @@ class CartService
             $discountedPrice = $product['discounted_price'] ?? $originalPrice;
 
             $cart[$sku] = [
-                'id' => $product['id'],
-                'sku' => $product['sku'],
-                'name' => $product['name'],
+                'id'               => $product['id'],
+                'sku'              => $product['sku'],
+                'name'             => $product['name'],
 
                 'original_price'   => $originalPrice,
-                'price'            => $discountedPrice,
+                'discounted_price' => $discountedPrice,
 
                 'discount'         => $originalPrice - $discountedPrice,
 
                 'cost_price'       => $product['cost_price'],
+
                 'quantity'         => 1,
             ];
         }
@@ -91,17 +92,36 @@ class CartService
         session()->forget($this->sessionKey);
     }
 
-    public function subtotal(): float
+    /**
+     * Total before discounts.
+     */
+   public function subtotal(): float
     {
         return collect($this->all())
             ->sum(fn ($item) => $item['original_price'] * $item['quantity']);
     }
 
+
+    /**
+     * Total discount.
+     */
+    public function discount(): float
+    {
+        return collect($this->all())
+            ->sum(fn ($item) => $item['discount'] * $item['quantity']);
+    }
+
+    /**
+     * Tax amount.
+     */
     public function tax(): float
     {
         return 0;
     }
 
+    /**
+     * Final payable amount.
+     */
     public function total(): float
     {
         return $this->subtotal()
@@ -118,11 +138,5 @@ class CartService
     public function replace(array $cart): void
     {
         session()->put($this->sessionKey, $cart);
-    }
-
-    public function discount(): float
-    {
-        return collect($this->all())
-            ->sum(fn ($item) => $item['discount'] * $item['quantity']);
     }
 }

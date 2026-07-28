@@ -16,6 +16,7 @@ class ProductForm
     {
         return $schema
             ->components([
+
                 Section::make('General Information')
                     ->schema([
                         Select::make('category_id')
@@ -77,6 +78,34 @@ class ProductForm
                     ])
                     ->columns(2),
 
+                Section::make('Discount')
+                    ->description('Configure automatic discounts for this product.')
+                    ->schema([
+
+                        Toggle::make('discount_active')
+                            ->label('Enable Discount')
+                            ->live(),
+
+                        Select::make('discount_type')
+                            ->label('Discount Type')
+                            ->options([
+                                'percentage' => 'Percentage (%)',
+                                'fixed' => 'Fixed Amount (KES)',
+                            ])
+                            ->visible(fn ($get) => $get('discount_active'))
+                            ->required(fn ($get) => $get('discount_active')),
+
+                        TextInput::make('discount_value')
+                            ->label('Discount Value')
+                            ->numeric()
+                            ->default(0)
+                            ->minValue(0)
+                            ->visible(fn ($get) => $get('discount_active'))
+                            ->required(fn ($get) => $get('discount_active')),
+
+                    ])
+                    ->columns(3),
+
                 Section::make('Inventory')
                     ->schema([
                         TextInput::make('stock_quantity')
@@ -96,8 +125,8 @@ class ProductForm
                             ->label('Maximum Stock')
                             ->numeric()
                             ->minValue(0)
-                            ->helperText('Optional maximum capacity for this product..'),
-                                                          
+                            ->helperText('Optional maximum capacity for this product.'),
+
                         TextInput::make('unit')
                             ->label('Unit')
                             ->default('Piece')

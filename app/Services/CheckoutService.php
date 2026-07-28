@@ -37,6 +37,7 @@ class CheckoutService
             }
 
             $subtotal = $this->cartService->subtotal();
+            $discount = $this->cartService->discount();
             $tax = $this->cartService->tax();
             $total = $this->cartService->total();
 
@@ -53,21 +54,21 @@ class CheckoutService
              */
 
             $sale = Sale::create([
-                'customer_id'     => $customerId,
-                'sale_date'       => now(),
-                'status'          => 'Draft',
+                'customer_id'    => $customerId,
+                'sale_date'      => now(),
+                'status'         => 'Draft',
 
-                'payment_method'  => $paymentMethod,
+                'payment_method' => $paymentMethod,
 
-                'subtotal'      => $subtotal,
-                'discount'      => $this->cartService->discount(),
-                'tax'           => $tax,
-                'total_amount'  => $total,
+                'subtotal'       => $subtotal,
+                'discount'       => $discount,
+                'tax'            => $tax,
+                'total_amount'   => $total,
 
-                'amount_paid'     => $amountPaid,
-                'change_amount'   => $change,
+                'amount_paid'    => $amountPaid,
+                'change_amount'  => $change,
 
-                'notes'           => null,
+                'notes'          => null,
             ]);
 
             /*
@@ -81,21 +82,22 @@ class CheckoutService
                 $product = Product::findOrFail($item['id']);
 
                 $sale->items()->create([
+                    'product_id'      => $product->id,
 
-                    'product_id'       => $product->id,
+                    'quantity'        => $item['quantity'],
 
-                    'quantity'         => $item['quantity'],
+                    'original_price'  => $item['original_price'],
 
-                    'original_price'   => $item['original_price'],
+                    // Price after discount
+                    'unit_price'      => $item['discounted_price'],
 
-                    'unit_price'       => $item['price'],
+                    // Discount per unit
+                    'discount_amount' => $item['discount'],
 
-                    'discount_amount'  => $item['discount'],
+                    'cost_price'      => $product->cost_price,
 
-                    'cost_price'       => $product->cost_price,
-
-                    'line_total'       => $item['price'] * $item['quantity'],
-
+                    // Final amount charged
+                    'line_total'      => $item['discounted_price'] * $item['quantity'],
                 ]);
             }
 
