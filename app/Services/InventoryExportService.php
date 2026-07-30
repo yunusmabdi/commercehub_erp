@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Product;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class InventoryExportService
@@ -13,60 +12,46 @@ class InventoryExportService
 
         $writer = SimpleExcelWriter::create($file);
 
-        $query = app(InventoryReportService::class)
+        $reportService = app(InventoryReportService::class);
+
+        $query = $reportService
             ->query($filters)
             ->orderBy('name');
 
-        $query->chunk(500, function ($products) use ($writer) {
+        foreach ($query->cursor() as $product) {
 
-            foreach ($products as $product) {
+            $stockValue = $product->stock_quantity * $product->cost_price;
 
-                $stockValue = $product->stock_quantity * $product->cost_price;
+            $writer->addRow([
 
-                $status = match (true) {
+                'Product' => $product->name,
 
-                    $product->stock_quantity == 0 => 'Out of Stock',
+                'SKU' => $product->sku,
 
-                    $product->stock_quantity <= $product->minimum_stock => 'Low Stock',
+                'Barcode' => $product->barcode,
 
-                    $product->stock_quantity > $product->maximum_stock => 'Overstocked',
+                'Category' => $product->category?->name,
 
-                    default => 'In Stock',
+                'Warehouse' => $product->warehouse?->name,
 
-                };
+                'Supplier' => $product->supplier?->name,
 
-                $writer->addRow([
+                'Cost Price' => $product->cost_price,
 
-                    'Product' => $product->name,
+                'Selling Price' => $product->selling_price,
 
-                    'SKU' => $product->sku,
+                'Current Stock' => $product->stock_quantity,
 
-                    'Barcode' => $product->barcode,
+                'Minimum Stock' => $product->minimum_stock,
 
-                    'Category' => $product->category?->name,
+                'Maximum Stock' => $product->maximum_stock,
 
-                    'Warehouse' => $product->warehouse?->name,
+                'Stock Value' => $stockValue,
 
-                    'Supplier' => $product->supplier?->name,
+                'Status' => $reportService->stockStatus($product),
 
-                    'Cost Price' => $product->cost_price,
-
-                    'Selling Price' => $product->selling_price,
-
-                    'Current Stock' => $product->stock_quantity,
-
-                    'Minimum Stock' => $product->minimum_stock,
-
-                    'Maximum Stock' => $product->maximum_stock,
-
-                    'Stock Value' => $stockValue,
-
-                    'Status' => $status,
-
-                ]);
-            }
-
-        });
+            ]);
+        }
 
         $writer->close();
 

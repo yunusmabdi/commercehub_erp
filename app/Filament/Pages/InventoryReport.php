@@ -4,14 +4,11 @@ namespace App\Filament\Pages;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Supplier;
-use App\Models\Warehouse;
 use App\Services\InventoryExportService;
 use App\Services\InventoryReportService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
@@ -21,13 +18,14 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class InventoryReport extends Page implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
+
+    protected string $view = 'filament.pages.inventory-report';
 
     protected static ?string $title = 'Inventory Report';
 
@@ -39,19 +37,13 @@ class InventoryReport extends Page implements HasForms, HasTable
 
     protected static ?int $navigationSort = 2;
 
-    protected string $view = 'filament.pages.inventory-report';
-
     public array $filters = [];
 
     public function mount(): void
     {
         $this->form->fill([
-            'warehouse' => null,
             'category' => null,
-            'supplier' => null,
             'status' => null,
-            'product' => null,
-            'sku' => null,
         ]);
     }
 
@@ -60,70 +52,46 @@ class InventoryReport extends Page implements HasForms, HasTable
         return $schema
             ->statePath('filters')
             ->components([
-                Grid::make(3)
-                    ->schema([
 
-                        Select::make('warehouse')
-                            ->label('Warehouse')
-                            ->placeholder('All Warehouses')
-                            ->searchable()
-                            ->options(
-                                Warehouse::query()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                            ),
+                Grid::make(2)
+                    ->schema([
 
                         Select::make('category')
                             ->label('Category')
                             ->placeholder('All Categories')
                             ->searchable()
+                            ->preload()
                             ->options(
                                 Category::query()
                                     ->orderBy('name')
                                     ->pluck('name', 'id')
                             ),
 
-                        Select::make('supplier')
-                            ->label('Supplier')
-                            ->placeholder('All Suppliers')
-                            ->searchable()
-                            ->options(
-                                Supplier::query()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                            ),
-
                         Select::make('status')
-                            ->placeholder('All Statuses')
+                            ->label('Stock Status')
+                            ->placeholder('All Status')
                             ->options([
                                 'in_stock' => 'In Stock',
                                 'low_stock' => 'Low Stock',
                                 'out_of_stock' => 'Out of Stock',
-                                'overstocked' => 'Overstocked',
                             ]),
 
-                        TextInput::make('product')
-                            ->placeholder('Search Product'),
-
-                        TextInput::make('sku')
-                            ->placeholder('Search SKU'),
-
                     ]),
-            ]);
-    }
 
-    protected function getTableQuery(): Builder
-    {
-        return app(InventoryReportService::class)
-            ->query($this->filters);
+            ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->query($this->getTableQuery())
+            ->query(
+                app(InventoryReportService::class)
+                    ->query($this->filters)
+            )
 
             ->defaultSort('name')
+
+            ->striped()
 
             ->columns([
 
@@ -143,14 +111,6 @@ class InventoryReport extends Page implements HasForms, HasTable
                     ->label('Category')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('warehouse.name')
-                    ->label('Warehouse')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('supplier.name')
-                    ->label('Supplier')
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('cost_price')
                     ->label('Cost Price')
                     ->money('KES')
@@ -166,41 +126,49 @@ class InventoryReport extends Page implements HasForms, HasTable
                 Tables\Columns\TextColumn::make('stock_quantity')
                     ->label('Current Stock')
                     ->numeric()
-                    ->alignCenter()
+                    ->alignEnd()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('minimum_stock')
                     ->label('Min')
-                    ->alignCenter(),
+                    ->numeric()
+                    ->alignEnd(),
 
                 Tables\Columns\TextColumn::make('maximum_stock')
                     ->label('Max')
-                    ->alignCenter(),
+                    ->numeric()
+                    ->alignEnd(),
 
                 Tables\Columns\TextColumn::make('stock_value')
                     ->label('Stock Value')
-                    ->state(fn (Product $record) => $record->stock_quantity * $record->cost_price)
+                    ->state(fn (Product $record) => $record->cost_price * $record->stock_quantity)
                     ->money('KES')
                     ->alignEnd(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->state(fn (Product $record) => app(InventoryReportService::class)->stockStatus($record))
+                    ->state(
+                        fn (Product $record) =>
+                        app(InventoryReportService::class)
+                            ->stockStatus($record)
+                    )
                     ->color(fn (string $state) => match ($state) {
+
                         'In Stock' => 'success',
+
                         'Low Stock' => 'warning',
+
                         'Out of Stock' => 'danger',
-                        'Overstocked' => 'info',
+
                         default => 'gray',
+
                     }),
 
             ])
 
-            ->striped()
-
             ->paginated([10, 25, 50, 100])
 
-            ->emptyStateHeading('No inventory found')
+            ->emptyStateHeading('No inventory found.')
 
             ->emptyStateDescription('Try adjusting your filters.')
 
@@ -217,7 +185,6 @@ class InventoryReport extends Page implements HasForms, HasTable
                         return response()
                             ->download($file)
                             ->deleteFileAfterSend();
-
                     }),
 
                 Action::make('pdf')
@@ -226,6 +193,7 @@ class InventoryReport extends Page implements HasForms, HasTable
                     ->action(function () {
 
                         return response()->streamDownload(
+
                             function () {
 
                                 echo app(InventoryReportService::class)
@@ -233,18 +201,12 @@ class InventoryReport extends Page implements HasForms, HasTable
                                     ->output();
 
                             },
+
                             'inventory-report.pdf'
                         );
-
                     }),
 
             ]);
-    }
-
-    public function summary(): array
-    {
-        return app(InventoryReportService::class)
-            ->summary($this->filters);
     }
 
     public function generateReport(): void
@@ -255,12 +217,8 @@ class InventoryReport extends Page implements HasForms, HasTable
     public function resetFilters(): void
     {
         $this->filters = [
-            'warehouse' => null,
             'category' => null,
-            'supplier' => null,
             'status' => null,
-            'product' => null,
-            'sku' => null,
         ];
 
         $this->form->fill($this->filters);

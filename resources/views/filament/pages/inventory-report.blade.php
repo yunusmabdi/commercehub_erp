@@ -1,15 +1,31 @@
 <x-filament-panels::page>
 
-    {{-- Filters --}}
+    {{ $this->form }}
 
-    {{-- Summary Cards --}}
+    <div class="mt-4 flex items-center gap-3">
 
-    <div class="mb-6">
+        <x-filament::button
+            wire:click="generateReport"
+            icon="heroicon-m-magnifying-glass">
 
-        {{-- Your 5 summary cards here --}}
+            Generate Report
+
+        </x-filament::button>
+
+        <x-filament::button
+            wire:click="resetFilters"
+            color="gray">
+
+            Reset
+
+        </x-filament::button>
 
     </div>
 
-    {{ $this->table }}
+    <div class="mt-6">
+
+        {{ $this->table }}
+
+    </div>
 
 </x-filament-panels::page>
